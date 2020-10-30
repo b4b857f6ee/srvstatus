@@ -1,6 +1,6 @@
 # SRVSTATUS
 
-## version 0.2
+## version 1.0
 
 ## Getting status of SystemD services using Telegraf+InfluxDB+Grafana
 
@@ -31,7 +31,7 @@ Fork of https://grafana.com/grafana/dashboards/12552 and https://github.com/mkop
   Also script provide a service name and time recent service status in seconds, 
   so you can use it in Grafana dashboards.
   
-  You can find the Grafana dashboard example in service_status.json file or on grafana.com:https://grafana.com/dashboards/8348
+  You can find the Grafana dashboard example in service_status.json file or on grafana.com:https://grafana.com/grafana/dashboards/13309
 
 ## Installation
 
