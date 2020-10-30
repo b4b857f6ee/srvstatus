@@ -35,7 +35,6 @@ Fork of https://grafana.com/grafana/dashboards/12552 and https://github.com/mkop
 
 ## Installation
 
-If your are using an hardening system with selinux enforced for CentOS7 put the file in /etc/telegraf/srvstatus and to chown telegraf -R /etc/telegraf/srvstatus
 ```
 $ cd /opt && git clone https://github.com/ratibor78/srvstatus.git
 $ cd /opt/srvstatus
