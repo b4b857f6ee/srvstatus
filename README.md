@@ -1,6 +1,6 @@
 # SRVSTATUS
 
-## version 0.1
+## version 0.2
 
 ## Getting status of SystemD services using Telegraf+InfluxDB+Grafana
 
@@ -35,6 +35,7 @@
 
 ## Installation
 
+If your are using an hardening system with selinux enforced for CentOS7 put the file in /etc/telegraf/srvstatus and to chown telegraf -R /etc/telegraf/srvstatus
 ```
 $ cd /opt && git clone https://github.com/ratibor78/srvstatus.git
 $ cd /opt/srvstatus
