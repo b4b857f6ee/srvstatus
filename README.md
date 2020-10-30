@@ -4,10 +4,10 @@
 
 ## Getting status of SystemD services using Telegraf+InfluxDB+Grafana
 
-![Alt text](https://github.com/ratibor78/servicestat/blob/master/services_grafana.png?raw=true "Grafana dashboard example")
-![Alt text](https://github.com/ratibor78/servicestat/blob/master/services_grafana1.png?raw=true "Grafana dashboard example")
+![Alt text](https://github.com/b4b857f6ee/srvstatus/blob/master/services_grafana.png?raw=true "Grafana dashboard example")
+![Alt text](https://github.com/b4b857f6ee/srvstatus/blob/master/services_grafana1.png?raw=true "Grafana dashboard example")
 
-
+Fork of https://grafana.com/grafana/dashboards/12552 and https://github.com/mkopnsrc/srvstatus
 
   Main goal of this easy script is checking list of given SystemD services and sending their status 
   including Up/Down time in to InfluxDB and Grafana dashboards. 
