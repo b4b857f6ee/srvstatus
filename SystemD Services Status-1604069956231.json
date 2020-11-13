@@ -73,7 +73,7 @@
   "gnetId": 8348,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1604070380549,
+  "iteration": 1605256994299,
   "links": [],
   "panels": [
     {
@@ -85,20 +85,20 @@
           },
           "mappings": [
             {
-              "from": "",
+              "from": "0",
               "id": 0,
               "operator": "",
               "text": "Alert",
-              "to": "",
-              "type": 1,
+              "to": "3",
+              "type": 2,
               "value": "0"
             },
             {
-              "from": "1",
+              "from": "4",
               "id": 1,
               "operator": "",
               "text": "Ok",
-              "to": "1024",
+              "to": "4",
               "type": 2,
               "value": "1"
             }
@@ -112,7 +112,7 @@
               },
               {
                 "color": "green",
-                "value": 1
+                "value": 4
               }
             ]
           }
@@ -266,7 +266,7 @@
           "measurement": "processes_processes",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"status\") FROM \"services_stats\" WHERE (\"host\" =~ /^$host$/) AND \"status\" = 0 AND $timeFilter GROUP BY time(1m) fill(null)",
+          "query": "SELECT count(\"status\") FROM \"services_stats\" WHERE (\"host\" =~ /^$host$/) AND \"status\" < 3 AND $timeFilter GROUP BY time(1m) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -316,7 +316,8 @@
       "fieldConfig": {
         "defaults": {
           "custom": {
-            "align": null
+            "align": null,
+            "filterable": false
           },
           "decimals": 3,
           "mappings": [],
@@ -349,13 +350,13 @@
       },
       "id": 25,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
+        "colorMode": "value",
+        "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "mean"
           ],
           "fields": "",
           "values": false
@@ -381,7 +382,7 @@
           ],
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT sum(\"status\") * 100 / count(\"status\") FROM (SELECT (\"status\" / \"status\") AS \"status\" FROM \"services_stats\" WHERE \"host\"=~/^$host$/ AND $timeFilter)",
+          "query": "SELECT sum(\"status\") * 100 / count(\"status\") FROM (SELECT (\"status\" / 4) AS \"status\" FROM \"services_stats\" WHERE \"host\"=~/^$host$/ AND $timeFilter)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -760,7 +761,7 @@
           "measurement": "services_stats",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"status\") FROM \"services_stats\" WHERE (\"host\" =~ /^$host$/ AND \"service\" =~ /^$service$/) AND \"status\"= 0 AND $timeFilter GROUP BY time($__interval) fill(none)",
+          "query": "SELECT count(\"status\") FROM \"services_stats\" WHERE (\"host\" =~ /^$host$/ AND \"service\" =~ /^$service$/) AND \"status\" < 4 AND $timeFilter GROUP BY time($__interval) fill(none)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -917,7 +918,7 @@
           "measurement": "processes_processes",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT mean(\"status\") FROM \"services_stats\" WHERE (\"host\" =~ /^$host$/ AND \"service\" =~ /^$service$/ ) AND \"status\" = 0 AND $timeFilter GROUP BY time($__interval), \"host\", \"service\" fill(null)",
+          "query": "SELECT mean(\"status\") FROM \"services_stats\" WHERE (\"host\" =~ /^$host$/ AND \"service\" =~ /^$service$/ ) AND \"status\" < 4 AND $timeFilter GROUP BY time($__interval), \"host\", \"service\" fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table",
@@ -974,7 +975,7 @@
       "type": "row"
     },
     {
-      "activePatternIndex": -3,
+      "activePatternIndex": 0,
       "cacheTimeout": null,
       "datasource": "${DS_INFLUXDB}",
       "debug_mode": false,
@@ -1039,7 +1040,7 @@
       "non_matching_cells_text": "n/a",
       "patterns": [
         {
-          "bgColors": "red|orange|green",
+          "bgColors": "red|red|red|orange|green",
           "bgColors_overrides": "0->green|2->red|1->yellow",
           "clickable_cells_link": "",
           "col_name": "_2_",
@@ -1070,10 +1071,10 @@
           "row_name": "_1_",
           "textColors": "red|orange|green",
           "textColors_overrides": "0->red|2->green|1->yellow",
-          "thresholds": "0,1",
+          "thresholds": "1,2,3,4",
           "time_based_thresholds": [],
           "tooltipTemplate": "Series : _series_ <br/>Row Name : _row_name_ <br/>Col Name : _col_name_ <br/>Value : _value_",
-          "transform_values": "n/a|Alert|Ok",
+          "transform_values": "n/a|Failed|Alert|Existed|Ok",
           "transform_values_overrides": "0->down|1->up",
           "valueName": "current"
         }
@@ -1183,10 +1184,36 @@
         "colorScheme": "interpolateGnYlRd",
         "defaultColor": "#757575",
         "exponent": 0.5,
-        "max": 1,
-        "min": 0,
+        "max": 4,
+        "min": 1,
         "mode": "spectrum",
-        "thresholds": []
+        "thresholds": [
+          {
+            "$$hashKey": "object:1456",
+            "color": "#37872D",
+            "value": "4"
+          },
+          {
+            "$$hashKey": "object:1460",
+            "color": "#FA6400",
+            "value": "3"
+          },
+          {
+            "$$hashKey": "object:1464",
+            "color": "#C4162A",
+            "value": "2"
+          },
+          {
+            "$$hashKey": "object:1468",
+            "color": "#C4162A",
+            "value": "1-2"
+          },
+          {
+            "$$hashKey": "object:1472",
+            "color": "#8F3BB8",
+            "value": "0"
+          }
+        ]
       },
       "datasource": "${DS_INFLUXDB}",
       "fieldConfig": {
@@ -1303,7 +1330,7 @@
       "yAxisSort": "a → z"
     }
   ],
-  "refresh": "1m",
+  "refresh": false,
   "schemaVersion": 26,
   "style": "dark",
   "tags": [],
@@ -1396,7 +1423,7 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {
@@ -1427,5 +1454,5 @@
   "timezone": "",
   "title": "SystemD Services Status",
   "uid": "6wtmoQJmt",
-  "version": 18
+  "version": 27
 }
