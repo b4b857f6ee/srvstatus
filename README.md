@@ -17,10 +17,10 @@ Fork of https://grafana.com/grafana/dashboards/12552 and https://github.com/mkop
   
   This script returns a Json format with services status coded by digits: 
 ```
-  active (running) = 1
-  active (existed) = 2
-  inactive (dead) = 3
-  failed  = 4
+  active (running) = 4
+  active (existed) = 3
+  inactive (dead) = 2
+  failed  = 1
   no match = 0
 ```  
   so you need to convert it back to string in Grafana. 
