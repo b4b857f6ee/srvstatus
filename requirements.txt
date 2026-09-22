@@ -1,2 +1,6 @@
-configparser==3.5.0
-parsedatetime==2.4
+# No third-party dependencies.
+#
+# Earlier releases required parsedatetime, and pinned configparser==3.5.0 — a
+# Python 2 backport that shadows the standard library when installed under
+# Python 3. Both are gone: service.py now uses only the standard library, so
+# there is no virtualenv to create and nothing to pip install.

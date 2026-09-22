@@ -1,2 +1,14 @@
 [SERVICES]
 name = service1.service service2.service
+
+# Optional: units started by `systemctl --user`.
+# [USER_SERVICES]
+# name = syncthing.service
+
+# Optional: which status encoding to emit.
+#   legacy (default) -> 4 active, 3 exited, 2 inactive, 1 failed, 0 unknown
+#                       matches "SystemD Services Status-1604069956231.json"
+#   modern           -> 1 active/exited, 3 inactive, 4 failed, 0 unknown
+#                       matches the dashboards under dashboards/
+# [OUTPUT]
+# convention = legacy

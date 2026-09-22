@@ -1,0 +1,8 @@
+# Units worth watching on a Proxmox VE node.
+# Inclusion rule: the unit carries a FUNCTION of the node or its SECURITY.
+# No oneshot unit that exits after boot -- it would always read as "inactive".
+[SERVICES]
+name = pve-cluster.service corosync.service pvedaemon.service pveproxy.service pvestatd.service pvescheduler.service pve-firewall.service proxmox-firewall.service pvefw-logger.service pve-ha-crm.service pve-ha-lrm.service qmeventd.service rrdcached.service watchdog-mux.service zfs-zed.service lxcfs.service smartmontools.service chrony.service ssh.service cron.service postfix.service telegraf.service systemd-journald.service
+
+[OUTPUT]
+convention = modern

@@ -1,0 +1,929 @@
+{
+  "description": "Vue multi-hôtes de l'état des unités systemd (srvstatus). Code couleur : vert = Ok · orange = ne remonte plus, ou unité introuvable · rouge = arrêtée ou en échec · gris « n/a » = non surveillée sur cet hôte.",
+  "editable": true,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${datasource}"
+      },
+      "description": "Ok tant qu'aucune unité n'est hors état « actif ».",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Ok"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "from": 1,
+                "result": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "ALERTE"
+                },
+                "to": 9999
+              },
+              "type": "range"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${datasource}"
+          },
+          "query": "from(bucket: \"linux\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"services_stats\" and r._field == \"status\")\n  |> filter(fn: (r) => r.host =~ /^(${host:pipe})$/ and r.service =~ /^(${service:pipe})$/)\n  |> last()\n  |> group()\n  |> map(fn: (r) => ({ r with _value:\n       if (int(v: now()) - int(v: r._time)) > 300000000000 then 1.0\n       else if float(v: r._value) == 1.0 then 0.0 else 1.0 }))\n  |> sum()",
+          "refId": "A"
+        }
+      ],
+      "title": "État global",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${datasource}"
+      },
+      "description": "Nombre d'unités arrêtées, en échec ou introuvables.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 6,
+        "y": 0
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${datasource}"
+          },
+          "query": "from(bucket: \"linux\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"services_stats\" and r._field == \"status\")\n  |> filter(fn: (r) => r.host =~ /^(${host:pipe})$/ and r.service =~ /^(${service:pipe})$/)\n  |> last()\n  |> group()\n  |> map(fn: (r) => ({ r with _value:\n       if (int(v: now()) - int(v: r._time)) > 300000000000 then 1.0\n       else if float(v: r._value) == 1.0 then 0.0 else 1.0 }))\n  |> sum()",
+          "refId": "A"
+        }
+      ],
+      "title": "Alertes en cours",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${datasource}"
+      },
+      "description": "Part des relevés en état « actif » sur la fenêtre affichée.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 3,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 99
+              },
+              {
+                "color": "green",
+                "value": 99.9
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 10,
+        "y": 0
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${datasource}"
+          },
+          "query": "from(bucket: \"linux\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"services_stats\" and r._field == \"status\")\n  |> filter(fn: (r) => r.host =~ /^(${host:pipe})$/ and r.service =~ /^(${service:pipe})$/)\n  |> map(fn: (r) => ({ r with _value: if float(v: r._value) == 1.0 then 100.0 else 0.0 }))\n  |> group()\n  |> mean()",
+          "refId": "A"
+        }
+      ],
+      "title": "Disponibilité",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${datasource}"
+          },
+          "query": "from(bucket: \"linux\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"services_stats\" and r._field == \"status\")\n  |> filter(fn: (r) => r.host =~ /^(${host:pipe})$/ and r.service =~ /^(${service:pipe})$/)\n  |> last()\n  |> group(columns: [\"host\"])\n  |> max()\n  |> group()\n  |> count()",
+          "refId": "A"
+        }
+      ],
+      "title": "Hôtes supervisés",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${datasource}"
+          },
+          "query": "from(bucket: \"linux\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"services_stats\" and r._field == \"status\")\n  |> filter(fn: (r) => r.host =~ /^(${host:pipe})$/ and r.service =~ /^(${service:pipe})$/)\n  |> last()\n  |> group()\n  |> count()",
+          "refId": "A"
+        }
+      ],
+      "title": "Services supervisés",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${datasource}"
+      },
+      "description": "Nombre d'unités hors état « actif », échantillonné sur la fenêtre.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisSoftMax": 1,
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 70,
+            "gradientMode": "opacity",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "decimals": 0,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 14,
+        "x": 0,
+        "y": 5
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${datasource}"
+          },
+          "query": "from(bucket: \"linux\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"services_stats\" and r._field == \"status\")\n  |> filter(fn: (r) => r.host =~ /^(${host:pipe})$/ and r.service =~ /^(${service:pipe})$/)\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> map(fn: (r) => ({ r with _value: if float(v: r._value) == 1.0 then 0.0 else 1.0 }))\n  |> group(columns: [\"_time\"])\n  |> sum()\n  |> group()\n  |> sort(columns: [\"_time\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Alertes dans le temps",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${datasource}"
+      },
+      "description": "Trié par ancienneté du dernier changement — le plus récent en haut.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "État"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "color": "orange",
+                        "index": 1,
+                        "text": "Introuvable"
+                      },
+                      "1": {
+                        "color": "green",
+                        "index": 0,
+                        "text": "Ok"
+                      },
+                      "3": {
+                        "color": "red",
+                        "index": 3,
+                        "text": "Arrêté"
+                      },
+                      "4": {
+                        "color": "dark-red",
+                        "index": 4,
+                        "text": "ÉCHEC"
+                      },
+                      "9": {
+                        "color": "orange",
+                        "index": 2,
+                        "text": "Silence"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "transparent",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Depuis"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dtdurations"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 14,
+        "y": 5
+      },
+      "options": {
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${datasource}"
+          },
+          "format": "table",
+          "query": "from(bucket: \"linux\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"services_stats\")\n  |> filter(fn: (r) => r._field == \"status\" or r._field == \"status_time\")\n  |> filter(fn: (r) => r.host =~ /^(${host:pipe})$/ and r.service =~ /^(${service:pipe})$/)\n  |> last()\n  |> group()\n  |> pivot(rowKey: [\"host\", \"service\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> sort(columns: [\"status_time\"])\n  |> limit(n: 15)\n  |> keep(columns: [\"host\", \"service\", \"status\", \"status_time\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Derniers changements d'état",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "host": "Hôte",
+              "service": "Service",
+              "status": "État",
+              "status_time": "Depuis"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "panels": [],
+      "title": "Matrice hôtes × services",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${datasource}"
+      },
+      "description": "« n/a » (gris) = l'unité n'est pas surveillée sur cet hôte, simple absence d'information. Orange = elle ne remonte plus depuis 5 min, ou l'unité est introuvable. Rouge = elle est KO.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "mode": "basic",
+              "type": "color-background"
+            },
+            "minWidth": 110
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "orange",
+                  "index": 1,
+                  "text": "Introuvable"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Ok"
+                },
+                "3": {
+                  "color": "red",
+                  "index": 3,
+                  "text": "Arrêté"
+                },
+                "4": {
+                  "color": "dark-red",
+                  "index": 4,
+                  "text": "ÉCHEC"
+                },
+                "9": {
+                  "color": "orange",
+                  "index": 2,
+                  "text": "Silence"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "noValue": "n/a",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "service"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Service"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "custom.width",
+                "value": 300
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": []
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${datasource}"
+          },
+          "format": "table",
+          "query": "from(bucket: \"linux\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"services_stats\" and r._field == \"status\")\n  |> filter(fn: (r) => r.host =~ /^(${host:pipe})$/ and r.service =~ /^(${service:pipe})$/)\n  |> last()\n  // Une unite qui remontait et ne remonte plus depuis 5 min = \"Silence\" (9),\n  // signale en orange. A ne pas confondre avec \"n/a\" (jamais surveillee ici),\n  // qui reste neutre : c'est une absence d'information, pas une anomalie.\n  |> map(fn: (r) => ({ r with _value:\n       if (int(v: now()) - int(v: r._time)) > 300000000000 then 9.0\n       else float(v: r._value) }))\n  |> group()\n  |> pivot(rowKey: [\"service\"], columnKey: [\"host\"], valueColumn: \"_value\")\n  |> sort(columns: [\"service\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "État courant — une colonne par hôte",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "panels": [],
+      "title": "Historique",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${datasource}"
+      },
+      "description": "Une bande par couple hôte / service. Vert = Ok, orange = unité introuvable, rouge = arrêtée ou en échec. Un trou signifie que l'hôte ne remontait rien à ce moment-là.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 90,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "displayName": "${__field.labels.host} · ${__field.labels.service}",
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "orange",
+                  "index": 1,
+                  "text": "Introuvable"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Ok"
+                },
+                "3": {
+                  "color": "red",
+                  "index": 3,
+                  "text": "Arrêté"
+                },
+                "4": {
+                  "color": "dark-red",
+                  "index": 4,
+                  "text": "ÉCHEC"
+                },
+                "9": {
+                  "color": "orange",
+                  "index": 2,
+                  "text": "Silence"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 3
+              },
+              {
+                "color": "dark-red",
+                "value": 4
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "mergeValues": true,
+        "perPage": 40,
+        "rowHeight": 0.9,
+        "showValue": "never",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${datasource}"
+          },
+          "query": "from(bucket: \"linux\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"services_stats\" and r._field == \"status\")\n  |> filter(fn: (r) => r.host =~ /^(${host:pipe})$/ and r.service =~ /^(${service:pipe})$/)\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) }))\n  |> keep(columns: [\"_time\", \"_value\", \"host\", \"service\"])\n  |> group(columns: [\"host\", \"service\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Historique des états",
+      "type": "state-timeline"
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 39,
+  "tags": [
+    "srvstatus",
+    "services",
+    "linux"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "influxdb-linux",
+          "value": "${DS_INFLUXDB-LINUX}"
+        },
+        "hide": 0,
+        "label": "Source",
+        "name": "datasource",
+        "query": "influxdb",
+        "refresh": 1,
+        "type": "datasource"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${datasource}"
+        },
+        "includeAll": true,
+        "label": "Hôte",
+        "multi": true,
+        "name": "host",
+        "options": [],
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"linux\", tag: \"host\", predicate: (r) => r._measurement == \"services_stats\", start: -30d)",
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${datasource}"
+        },
+        "includeAll": true,
+        "label": "Service",
+        "multi": true,
+        "name": "service",
+        "options": [],
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"linux\", tag: \"service\", predicate: (r) => r._measurement == \"services_stats\", start: -30d)",
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "Supervision des services systemd",
+  "uid": "srvstatus02",
+  "__inputs": [
+    {
+      "name": "DS_INFLUXDB-LINUX",
+      "label": "influxdb-linux",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "influxdb",
+      "pluginName": "InfluxDB"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "11.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "influxdb",
+      "name": "InfluxDB",
+      "version": "1.0.0"
+    }
+  ]
+}
