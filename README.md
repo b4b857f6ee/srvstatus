@@ -4,15 +4,15 @@
 
 ## Monitoring SystemD services — and Proxmox health — with Telegraf + InfluxDB + Grafana
 
-![The srvstatus dashboard](https://github.com/b4b857f6ee/srvstatus/blob/master/docs/dashboard-srvstatus.png?raw=true)
+![The srvstatus dashboard](docs/dashboard-srvstatus.png)
 
 *Five hosts, 102 units. Host names are redacted in this screenshot.*
 
 <details>
 <summary>Screenshots of the 1.x dashboard</summary>
 
-![1.x dashboard](https://github.com/b4b857f6ee/srvstatus/blob/master/services_grafana.png?raw=true)
-![1.x dashboard](https://github.com/b4b857f6ee/srvstatus/blob/master/services_grafana1.png?raw=true)
+![1.x dashboard](services_grafana.png)
+![1.x dashboard](services_grafana1.png)
 
 </details>
 
