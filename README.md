@@ -4,8 +4,17 @@
 
 ## Monitoring SystemD services — and Proxmox health — with Telegraf + InfluxDB + Grafana
 
-![Grafana dashboard example](https://github.com/b4b857f6ee/srvstatus/blob/master/services_grafana.png?raw=true)
-![Grafana dashboard example](https://github.com/b4b857f6ee/srvstatus/blob/master/services_grafana1.png?raw=true)
+![The srvstatus dashboard](https://github.com/b4b857f6ee/srvstatus/blob/master/docs/dashboard-srvstatus.png?raw=true)
+
+*Five hosts, 102 units. Host names are redacted in this screenshot.*
+
+<details>
+<summary>Screenshots of the 1.x dashboard</summary>
+
+![1.x dashboard](https://github.com/b4b857f6ee/srvstatus/blob/master/services_grafana.png?raw=true)
+![1.x dashboard](https://github.com/b4b857f6ee/srvstatus/blob/master/services_grafana1.png?raw=true)
+
+</details>
 
 Fork of <https://grafana.com/grafana/dashboards/12552> and
 <https://github.com/mkopnsrc/srvstatus>.
@@ -166,7 +175,7 @@ survives one node going down.
 
 | File | Encoding | Contents |
 |---|---|---|
-| `dashboards/srvstatus-systemd-services.json` | `modern` | unit status across hosts |
+| `dashboards/srvstatus-systemd-services.json` | `modern` | unit status across hosts — *this is the dashboard in the screenshot above* |
 | `dashboards/proxmox-functional-health.json` | — | quorum, replication, storages, ZFS, HA |
 | `dashboards/legacy-systemd-services-status.json` | `legacy` | the original 1.x dashboard |
 
